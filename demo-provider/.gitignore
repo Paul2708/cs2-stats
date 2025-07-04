@@ -1,3 +1,10 @@
 .idea
 node_modules
 .env
+
+# Internal project notes
+notes.md
+
+# Test demo downloads
+*.dem
+*.dem.bz2
