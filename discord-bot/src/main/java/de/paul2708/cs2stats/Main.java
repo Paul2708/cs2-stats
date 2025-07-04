@@ -1,17 +1,23 @@
 package de.paul2708.cs2stats;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import io.github.cdimascio.dotenv.Dotenv;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        Dotenv dotenv = Dotenv.load();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        JDA jda = JDABuilder.createDefault(dotenv.get("BOT_TOKEN")).build();
+
+        jda.updateCommands().addCommands(
+                Commands.slash("register", "Repeats messages back to you.")
+                        .addOption(OptionType.STRING, "steamid", "Your Steam ID", false)
+                        .addOption(OptionType.STRING, "sharecode", "Your latest share code (i.e., CSGO-...).", false)
+                        .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false)
+        ).queue();
+        jda.addEventListener(new RegisterCommand());
     }
 }
