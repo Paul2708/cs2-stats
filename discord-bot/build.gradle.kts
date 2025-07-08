@@ -17,8 +17,15 @@ repositories {
 
 dependencies {
     implementation("net.dv8tion:JDA:$jdaVersion")
+
     implementation("ch.qos.logback:logback-classic:1.5.13")
+
     implementation("io.github.cdimascio:dotenv-java:3.2.0")
+
+    implementation("de.chojo.sadu:sadu-postgresql:2.3.2")
+    implementation("de.chojo.sadu:sadu-datasource:2.3.2")
+    implementation("de.chojo.sadu:sadu-mapper:2.3.2")
+    implementation("de.chojo.sadu:sadu-queries:2.3.2")
 }
 
 tasks.withType<JavaCompile> {
