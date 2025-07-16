@@ -26,6 +26,8 @@ dependencies {
     implementation("de.chojo.sadu:sadu-datasource:2.3.2")
     implementation("de.chojo.sadu:sadu-mapper:2.3.2")
     implementation("de.chojo.sadu:sadu-queries:2.3.2")
+
+    implementation("org.knowm.xchart:xchart:3.8.8")
 }
 
 tasks.withType<JavaCompile> {
@@ -33,4 +35,8 @@ tasks.withType<JavaCompile> {
     options.isIncremental = true
 
     sourceCompatibility = "21"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
