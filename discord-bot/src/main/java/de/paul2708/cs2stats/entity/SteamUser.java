@@ -2,7 +2,7 @@ package de.paul2708.cs2stats.entity;
 
 import de.chojo.sadu.mapper.annotation.MappingProvider;
 import de.chojo.sadu.mapper.rowmapper.RowMapping;
-import de.paul2708.cs2stats.ShareCode;
+import de.paul2708.cs2stats.steam.ShareCode;
 
 public record SteamUser(String steamId, ShareCode shareCode, String authenticationCode) {
 
