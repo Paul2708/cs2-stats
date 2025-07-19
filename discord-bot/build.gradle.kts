@@ -28,6 +28,8 @@ dependencies {
     implementation("de.chojo.sadu:sadu-queries:2.3.2")
 
     implementation("org.knowm.xchart:xchart:3.8.8")
+
+    implementation("org.json:json:20250517")
 }
 
 tasks.withType<JavaCompile> {
