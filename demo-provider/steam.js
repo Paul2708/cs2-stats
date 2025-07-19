@@ -59,6 +59,7 @@ csClient.on('matchList', (matches, data) => {
         const matchResponse = {
             matchId: matchId,
             demoUrl: demoUrl,
+            matchTime: data["matches"][0]["matchtime"],
         }
         requestItem.callback(matchResponse);
 

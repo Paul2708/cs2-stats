@@ -13,6 +13,7 @@ app.get('/demo/:shareCode', (req, res) => {
     requestGame(req.params.shareCode, (matchResponse) => {
         const matchId = matchResponse.matchId;
         const demoUrl = matchResponse.demoUrl;
+        const matchTime = matchResponse.matchTime;
 
         console.log("Fetched: " + matchId, demoUrl)
 
@@ -25,6 +26,7 @@ app.get('/demo/:shareCode', (req, res) => {
                     matchId: matchId,
                     demoUrl: demoUrl,
                     match: parseDemo(path),
+                    matchTime: matchTime,
                 }
                 res.status(200).send(response)
             }
