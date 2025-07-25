@@ -30,6 +30,8 @@ dependencies {
     implementation("org.knowm.xchart:xchart:3.8.8")
 
     implementation("org.json:json:20250517")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
 }
 
 tasks.withType<JavaCompile> {
