@@ -1,5 +1,6 @@
 package de.paul2708.cs2stats;
 
+import de.paul2708.cs2stats.discord.RegisterCommand;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;

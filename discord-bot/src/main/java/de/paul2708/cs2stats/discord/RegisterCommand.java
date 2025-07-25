@@ -1,4 +1,4 @@
-package de.paul2708.cs2stats;
+package de.paul2708.cs2stats.discord;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
