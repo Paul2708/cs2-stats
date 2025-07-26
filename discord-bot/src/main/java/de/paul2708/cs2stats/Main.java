@@ -1,6 +1,8 @@
 package de.paul2708.cs2stats;
 
 import de.paul2708.cs2stats.discord.RegisterCommand;
+import de.paul2708.cs2stats.repository.DatabaseConnector;
+import de.paul2708.cs2stats.repository.SteamUserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -11,6 +13,12 @@ public class Main {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
 
+        DatabaseConnector databaseConnector = new DatabaseConnector();
+        databaseConnector.connect(dotenv);
+
+        SteamUserRepository steamUserRepository = new SteamUserRepository();
+
+        // Create Discord bot
         JDA jda = JDABuilder.createDefault(dotenv.get("BOT_TOKEN")).build();
 
         jda.updateCommands().addCommands(
@@ -19,6 +27,6 @@ public class Main {
                         .addOption(OptionType.STRING, "sharecode", "Your latest share code (i.e., CSGO-...).", false)
                         .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false)
         ).queue();
-        jda.addEventListener(new RegisterCommand());
+        jda.addEventListener(new RegisterCommand(steamUserRepository));
     }
 }

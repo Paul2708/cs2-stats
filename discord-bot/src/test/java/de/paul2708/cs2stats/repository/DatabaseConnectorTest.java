@@ -18,6 +18,6 @@ public class DatabaseConnectorTest {
     @Test
     void testConnection() {
         DatabaseConnector connector = new DatabaseConnector();
-        connector.createDatasource(dotenv);
+        connector.connect(dotenv);
     }
 }

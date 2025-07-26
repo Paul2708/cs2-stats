@@ -26,6 +26,7 @@ dependencies {
     implementation("de.chojo.sadu:sadu-datasource:2.3.2")
     implementation("de.chojo.sadu:sadu-mapper:2.3.2")
     implementation("de.chojo.sadu:sadu-queries:2.3.2")
+    implementation("de.chojo.sadu:sadu-updater:2.3.2")
     implementation("org.postgresql:postgresql:42.7.7")
 
     implementation("org.knowm.xchart:xchart:3.8.8")
