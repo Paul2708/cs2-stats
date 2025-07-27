@@ -22,9 +22,9 @@ public class DemoProviderClientTest {
         DemoProviderClient demoProviderClient = new DemoProviderClient(dotenv);
 
         try {
-            MatchResponse matchResponse = demoProviderClient.requestMatch(ShareCode.fromCode("CSGO-KDoMb-JO4FR-7R3QX-jRvD9-ApWjM"));
+            Match match = demoProviderClient.requestMatch(ShareCode.fromCode("CSGO-KDoMb-JO4FR-7R3QX-jRvD9-ApWjM"));
 
-            assertEquals("de_nuke", matchResponse.match().map());
+            assertEquals("de_nuke", match.matchDetails().map());
         } catch (Exception e) {
             fail(e);
         }

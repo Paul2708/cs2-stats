@@ -24,7 +24,7 @@ public class DemoProviderClient {
         this.client = HttpClient.newHttpClient();
     }
 
-    public MatchResponse requestMatch(ShareCode shareCode) throws Exception {
+    public Match requestMatch(ShareCode shareCode) throws Exception {
         String url = String.format(
                 ENDPOINT, baseUrl, port, shareCode.shareCode()
         );
@@ -45,7 +45,7 @@ public class DemoProviderClient {
 
         if (response.statusCode() == 200) {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(response.body(), MatchResponse.class);
+            return mapper.readValue(response.body(), Match.class);
         }
 
         throw new IllegalStateException("Unexpected response code: " + response.statusCode() + " Body: " + response.body());
