@@ -4,13 +4,13 @@ import de.chojo.sadu.mapper.annotation.MappingProvider;
 import de.chojo.sadu.mapper.rowmapper.RowMapping;
 import de.paul2708.cs2stats.steam.ShareCode;
 
-public record SteamUser(String steamId, ShareCode shareCode, String authenticationCode) {
+public record SteamUser(String steamId, ShareCode initialShareCode, String authenticationCode) {
 
     @MappingProvider({"user"})
     public static RowMapping<SteamUser> map() {
         return row -> new SteamUser(
                 row.getString("steamId"),
-                ShareCode.fromCode(row.getString("shareCode")),
+                ShareCode.fromCode(row.getString("initialShareCode")),
                 row.getString("authenticationCode")
         );
     }

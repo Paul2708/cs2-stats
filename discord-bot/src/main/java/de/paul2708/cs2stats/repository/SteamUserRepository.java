@@ -11,10 +11,10 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 public class SteamUserRepository {
 
     public InsertionResult save(SteamUser user) {
-        return query("INSERT INTO steamusers(steamId, shareCode, authenticationCode) VALUES(:steamId, :shareCode, :authenticationCode)")
+        return query("INSERT INTO steamusers(steamId, initialShareCode, authenticationCode) VALUES(:steamId, :initialShareCode, :authenticationCode)")
                 .single(Call.of()
                         .bind("steamId", user.steamId())
-                        .bind("shareCode", user.shareCode().shareCode())
+                        .bind("initialShareCode", user.initialShareCode().shareCode())
                         .bind("authenticationCode", user.authenticationCode()))
                 .insert();
     }
