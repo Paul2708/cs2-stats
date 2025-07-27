@@ -39,9 +39,9 @@ public class RegisterCommand extends ListenerAdapter {
                     return;
                 }
 
-                SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode);
-                steamUserRepository.save(steamUser);
-                
+                SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode);
+                steamUserRepository.create(steamUser);
+
                 event.reply("Registered :)")
                         .setEphemeral(true)
                         .queue();
