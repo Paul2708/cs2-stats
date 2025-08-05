@@ -1,19 +1,38 @@
 package de.paul2708.cs2stats.discord;
 
 import de.paul2708.cs2stats.entity.SteamUser;
+import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
+import de.paul2708.cs2stats.steam.DemoProviderClient;
+import de.paul2708.cs2stats.steam.Match;
 import de.paul2708.cs2stats.steam.ShareCode;
+import de.paul2708.cs2stats.steam.SteamClient;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class RegisterCommand extends ListenerAdapter {
 
     private final SteamUserRepository steamUserRepository;
+    private final MatchRepository matchRepository;
 
-    public RegisterCommand(SteamUserRepository steamUserRepository) {
+    private final SteamClient steamClient;
+    private final DemoProviderClient demoProviderClient;
+
+    private final ExecutorService executorService;
+
+    public RegisterCommand(SteamUserRepository steamUserRepository, MatchRepository matchRepository, SteamClient steamClient, DemoProviderClient demoProviderClient) {
         this.steamUserRepository = steamUserRepository;
+        this.matchRepository = matchRepository;
+        this.steamClient = steamClient;
+        this.demoProviderClient = demoProviderClient;
+
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -42,7 +61,9 @@ public class RegisterCommand extends ListenerAdapter {
                 SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode);
                 steamUserRepository.create(steamUser);
 
-                event.reply("Registered :)")
+                fetchPreviousMatches(steamUser);
+
+                event.reply("Registered :) We are fetching your previous games. This may take a while.")
                         .setEphemeral(true)
                         .queue();
             } else {
@@ -58,5 +79,32 @@ public class RegisterCommand extends ListenerAdapter {
                         .queue();
             }
         }
+    }
+
+    private void fetchPreviousMatches(SteamUser steamUser) {
+        this.executorService.submit(() -> {
+            try {
+                steamClient.requestConsecutiveCodes(steamUser.steamId(), steamUser.authenticationCode(), steamUser.lastKnownShareCode().shareCode(),
+                        shareCode -> {
+                            if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
+                                System.out.println("Skipped match because already stored");
+                                return;
+                            }
+
+                            try {
+                                Match match = demoProviderClient.requestMatch(shareCode);
+                                System.out.println(match);
+
+                                matchRepository.create(match);
+                            } catch (Exception e) {
+                                System.out.println("Failed to fetch previous matches");
+                                e.printStackTrace();
+                            }
+                        });
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Failed to fetch previous matches");
+                e.printStackTrace();
+            }
+        });
     }
 }

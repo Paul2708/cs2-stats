@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class SteamClient {
 
@@ -42,6 +43,20 @@ public class SteamClient {
         }
 
         return shareCodes;
+    }
+
+    public void requestConsecutiveCodes(String steamUserId, String authenticationCode, String initialShareCode,
+                                        Consumer<ShareCode> consumer)
+            throws IOException, InterruptedException {
+        Optional<String> shareCodeIter = Optional.of(initialShareCode);
+        while (shareCodeIter.isPresent()) {
+            consumer.accept(ShareCode.fromCode(shareCodeIter.get()));
+
+            shareCodeIter = requestShareCode(steamUserId, authenticationCode, shareCodeIter.get());
+
+            TimeUnit.MILLISECONDS.sleep(500);
+        }
+
     }
 
     private Optional<String> requestShareCode(String steamUserId, String authenticationCode, String previousShareCode)

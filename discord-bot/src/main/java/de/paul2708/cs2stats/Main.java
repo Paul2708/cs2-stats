@@ -2,7 +2,10 @@ package de.paul2708.cs2stats;
 
 import de.paul2708.cs2stats.discord.RegisterCommand;
 import de.paul2708.cs2stats.repository.DatabaseConnector;
+import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
+import de.paul2708.cs2stats.steam.DemoProviderClient;
+import de.paul2708.cs2stats.steam.SteamClient;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -16,7 +19,11 @@ public class Main {
         DatabaseConnector databaseConnector = new DatabaseConnector();
         databaseConnector.connect(dotenv);
 
+        SteamClient steamClient = new SteamClient(dotenv);
+        DemoProviderClient demoProviderClient = new DemoProviderClient(dotenv);
+
         SteamUserRepository steamUserRepository = new SteamUserRepository();
+        MatchRepository matchRepository = new MatchRepository();
 
         // Create Discord bot
         JDA jda = JDABuilder.createDefault(dotenv.get("BOT_TOKEN")).build();
@@ -27,6 +34,6 @@ public class Main {
                         .addOption(OptionType.STRING, "sharecode", "Your latest share code (i.e., CSGO-...).", false)
                         .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false)
         ).queue();
-        jda.addEventListener(new RegisterCommand(steamUserRepository));
+        jda.addEventListener(new RegisterCommand(steamUserRepository, matchRepository, steamClient, demoProviderClient));
     }
 }
