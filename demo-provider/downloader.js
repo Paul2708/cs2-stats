@@ -21,14 +21,14 @@ function downloadDemo(url, callback) {
                 const data = fs.readFileSync(file.path, 'utf8');
 
                 if (data.includes("Google-Edge-Cache: origin retries exhausted")) {
+                    fs.unlinkSync(file.path);
                     callback("error: Google Edge Cache");
                     return;
                 }
             } catch (err) {
+                fs.unlinkSync(file.path);
                 callback("error: Failed to read file");
                 return;
-            } finally {
-                fs.unlinkSync(file.path);
             }
 
             fs.createReadStream(file.path)
