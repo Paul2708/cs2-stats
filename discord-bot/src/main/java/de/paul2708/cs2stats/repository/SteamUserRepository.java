@@ -1,8 +1,6 @@
 package de.paul2708.cs2stats.repository;
 
 import de.chojo.sadu.queries.api.call.Call;
-import de.chojo.sadu.queries.api.results.writing.insertion.InsertionResult;
-import de.chojo.sadu.queries.api.results.writing.manipulation.ManipulationResult;
 import de.paul2708.cs2stats.entity.SteamUser;
 
 import java.util.List;
@@ -12,8 +10,8 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 
 public class SteamUserRepository {
 
-    public InsertionResult create(SteamUser user) {
-        return query("INSERT INTO steamusers(steamId, initialShareCode, authenticationCode, lastKnownShareCode) VALUES(:steamId, :initialShareCode, :authenticationCode, :lastKnownShareCode)")
+    public void create(SteamUser user) {
+        query("INSERT INTO steamusers(steamId, initialShareCode, authenticationCode, lastKnownShareCode) VALUES(:steamId, :initialShareCode, :authenticationCode, :lastKnownShareCode)")
                 .single(Call.of()
                         .bind("steamId", user.steamId())
                         .bind("initialShareCode", user.initialShareCode().shareCode())
@@ -22,8 +20,8 @@ public class SteamUserRepository {
                 .insert();
     }
 
-    public ManipulationResult updateLastKnownShareCode(String steamId, String updatedShareCode) {
-        return query("UPDATE steamusers SET lastKnownShareCode = :lastKnownShareCode WHERE steamId = :steamId")
+    public void updateLastKnownShareCode(String steamId, String updatedShareCode) {
+        query("UPDATE steamusers SET lastKnownShareCode = :lastKnownShareCode WHERE steamId = :steamId")
                 .single(Call.of()
                         .bind("lastKnownShareCode", updatedShareCode)
                         .bind("steamId", steamId))

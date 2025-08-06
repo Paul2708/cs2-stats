@@ -43,6 +43,7 @@ public class MatchService {
 
     public void fetchLatestMatchesPeriodically() {
         periodicExecutorService.submit(() -> {
+            //noinspection InfiniteLoopStatement
             while (true) {
                 logger.info("Start fetching latest matches for all registered users.");
                 try {

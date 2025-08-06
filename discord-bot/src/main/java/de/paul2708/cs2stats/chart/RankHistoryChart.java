@@ -11,7 +11,7 @@ import java.util.*;
 
 public final class RankHistoryChart {
 
-    private static Logger logger = LoggerFactory.getLogger(RankHistoryChart.class);
+    private static final Logger logger = LoggerFactory.getLogger(RankHistoryChart.class);
 
     private RankHistoryChart() {
 

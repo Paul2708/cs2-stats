@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import de.chojo.sadu.queries.api.call.Call;
-import de.chojo.sadu.queries.api.results.writing.insertion.InsertionResult;
 import de.paul2708.cs2stats.steam.Match;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class MatchRepository {
         this.objectWriter = new ObjectMapper().writer();
     }
 
-    public InsertionResult create(Match match) {
+    public void create(Match match) {
         String statsAsJson;
         try {
             statsAsJson = objectWriter.writeValueAsString(match.matchDetails().scoreboard());
@@ -28,7 +27,7 @@ public class MatchRepository {
             throw new RuntimeException(e);
         }
 
-        return query("INSERT INTO matches(matchId, matchTime, map, stats) VALUES(:matchId, :matchTime, :map, :stats::jsonb)")
+        query("INSERT INTO matches(matchId, matchTime, map, stats) VALUES(:matchId, :matchTime, :map, :stats::jsonb)")
                 .single(Call.of()
                         .bind("matchId", match.matchId())
                         .bind("matchTime", match.matchTime())
