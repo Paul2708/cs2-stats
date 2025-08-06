@@ -21,11 +21,11 @@ public class SteamUserRepository {
                 .insert();
     }
 
-    public ManipulationResult updateLastKnownShareCode(SteamUser steamUser) {
-        return query("UPDATE steamusers SET lastKnownShareCode = 'NEW_SHARE_CODE' WHERE steamId = :steamId")
+    public ManipulationResult updateLastKnownShareCode(String steamId, String updatedShareCode) {
+        return query("UPDATE steamusers SET lastKnownShareCode = :lastKnownShareCode WHERE steamId = :steamId")
                 .single(Call.of()
-                        .bind("lastKnownShareCode", steamUser.lastKnownShareCode().shareCode())
-                        .bind("steamId", steamUser.steamId()))
+                        .bind("lastKnownShareCode", updatedShareCode)
+                        .bind("steamId", steamId))
                 .update();
     }
 

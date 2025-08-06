@@ -38,7 +38,7 @@ public class MatchService {
     }
 
     public void fetchLatestMatches(SteamUser steamUser) {
-        this.executorService.submit(() -> requestMatches(steamUser));
+        this.executorService.submit(() -> requestMatches(steamUser, false));
     }
 
     public void fetchLatestMatchesPeriodically() {
@@ -47,7 +47,7 @@ public class MatchService {
                 logger.info("Start fetching latest matches for all registered users.");
                 try {
                     for (SteamUser steamUser : steamUserRepository.findAll()) {
-                        fetchLatestMatches(steamUser);
+                        this.executorService.submit(() -> requestMatches(steamUser, true));
                         Thread.sleep(Duration.ofMinutes(1));
                     }
 
@@ -61,26 +61,32 @@ public class MatchService {
         });
     }
 
-    private void requestMatches(SteamUser steamUser) {
+    private void requestMatches(SteamUser steamUser, boolean skipIfEqualCodes) {
         logger.info("Start to request matches for Steam user {}", steamUser.steamId());
 
         try {
-            steamClient.requestConsecutiveCodes(steamUser.steamId(), steamUser.authenticationCode(), steamUser.lastKnownShareCode().shareCode(),
-                    shareCode -> {
-                        if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
-                            logger.info("Found new match but skipped because it is already stored");
-                            return;
-                        }
+            steamClient.requestConsecutiveCodes(steamUser.steamId(), steamUser.authenticationCode(), steamUser.lastKnownShareCode().shareCode(), shareCode -> {
+                if (skipIfEqualCodes && steamUser.lastKnownShareCode().equals(shareCode)) {
+                    logger.info("No new match found.");
+                    return;
+                }
 
-                        try {
-                            Match match = demoProviderClient.requestMatch(shareCode);
-                            matchRepository.create(match);
+                steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
 
-                            logger.info("Found and stored new match with ID {}", shareCode.matchId());
-                        } catch (Exception e) {
-                            logger.error("Failed to request match demo for share code {}", shareCode, e);
-                        }
-                    });
+                if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
+                    logger.info("Found new match but skipped because it is already stored");
+                    return;
+                }
+
+                try {
+                    Match match = demoProviderClient.requestMatch(shareCode);
+                    matchRepository.create(match);
+
+                    logger.info("Found and stored new match with ID {}", shareCode.matchId());
+                } catch (Exception e) {
+                    logger.error("Failed to request match demo for share code {}", shareCode, e);
+                }
+            });
         } catch (IOException | InterruptedException e) {
             logger.error("Failed to fetch consecutive share codes", e);
         }
