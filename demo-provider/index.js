@@ -25,7 +25,7 @@ app.get('/demo/:shareCode', (req, res) => {
                 const response = {
                     matchId: matchId,
                     demoUrl: demoUrl,
-                    match: parseDemo(path),
+                    matchDetails: parseDemo(path),
                     matchTime: matchTime,
                 }
                 res.status(200).send(response)
