@@ -27,6 +27,8 @@ function downloadDemo(url, callback) {
             } catch (err) {
                 callback("error: Failed to read file");
                 return;
+            } finally {
+                fs.unlinkSync(file.path);
             }
 
             fs.createReadStream(file.path)
