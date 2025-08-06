@@ -5,6 +5,7 @@ import de.paul2708.cs2stats.discord.RegisterCommand;
 import de.paul2708.cs2stats.repository.DatabaseConnector;
 import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
+import de.paul2708.cs2stats.service.MatchService;
 import de.paul2708.cs2stats.steam.DemoProviderClient;
 import de.paul2708.cs2stats.steam.SteamClient;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -15,16 +16,21 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Main {
     public static void main(String[] args) {
+        // Load environment variables
         Dotenv dotenv = Dotenv.load();
 
+        // Connect to database
         DatabaseConnector databaseConnector = new DatabaseConnector();
         databaseConnector.connect(dotenv);
+
+        // Create services
+        SteamUserRepository steamUserRepository = new SteamUserRepository();
+        MatchRepository matchRepository = new MatchRepository();
 
         SteamClient steamClient = new SteamClient(dotenv);
         DemoProviderClient demoProviderClient = new DemoProviderClient(dotenv);
 
-        SteamUserRepository steamUserRepository = new SteamUserRepository();
-        MatchRepository matchRepository = new MatchRepository();
+        MatchService matchService = new MatchService(steamUserRepository, matchRepository, steamClient, demoProviderClient);
 
         // Create Discord bot
         JDA jda = JDABuilder.createDefault(dotenv.get("BOT_TOKEN")).build();
@@ -36,7 +42,10 @@ public class Main {
                         .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false),
                 Commands.slash("ranks", "Plot the rank history of all registered users.")
         ).queue();
-        jda.addEventListener(new RegisterCommand(steamUserRepository, matchRepository, steamClient, demoProviderClient));
+        jda.addEventListener(new RegisterCommand(steamUserRepository, matchService));
         jda.addEventListener(new RankHistoryCommand(steamUserRepository, matchRepository));
+
+        // Run update task
+        matchService.fetchLatestMatchesPeriodically();
     }
 }
