@@ -18,10 +18,11 @@ app.get('/demo/:shareCode', (req, res) => {
         console.log("Fetched: " + matchId, demoUrl)
 
         downloadDemo(demoUrl, (path) => {
-            if (path.startsWith("error")) {
+            if (path.startsWith("error: Google Edge Cache")) {
+                res.status(404).send(path);
+            } else if (path.startsWith("error")) {
                 res.status(500).send(path);
             } else {
-
                 const response = {
                     matchId: matchId,
                     demoUrl: demoUrl,
