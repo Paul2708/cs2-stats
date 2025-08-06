@@ -3,11 +3,15 @@ package de.paul2708.cs2stats.chart;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.style.Styler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
 
 public final class RankHistoryChart {
+
+    private static Logger logger = LoggerFactory.getLogger(RankHistoryChart.class);
 
     private RankHistoryChart() {
 
@@ -41,6 +45,7 @@ public final class RankHistoryChart {
         try {
             return BitmapEncoder.getBitmapBytes(chart, BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
+            logger.error("Failed to generate plot", e);
             throw new RuntimeException(e);
         }
     }

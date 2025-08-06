@@ -9,10 +9,14 @@ import de.paul2708.cs2stats.steam.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class RankHistoryCommand extends ListenerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(RankHistoryCommand.class);
 
     private final SteamUserRepository steamUserRepository;
     private final MatchRepository matchRepository;
@@ -25,6 +29,8 @@ public class RankHistoryCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equals("ranks")) {
+            logger.info("Handle /ranks command issued by {}", event.getUser().getName());
+
             List<Match> matches = matchRepository.findAll();
             List<String> steamIds = steamUserRepository.findAll().stream()
                     .map(SteamUser::steamId)
@@ -56,6 +62,8 @@ public class RankHistoryCommand extends ListenerAdapter {
                     .addFiles(FileUpload.fromData(plot, "plot.png"))
                     .setEphemeral(true)
                     .queue();
+
+            logger.info("Plot generated for {}", event.getUser().getName());
         }
     }
 }

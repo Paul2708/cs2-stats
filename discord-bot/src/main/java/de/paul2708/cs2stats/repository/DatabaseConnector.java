@@ -57,8 +57,4 @@ public class DatabaseConnector {
             throw new RuntimeException(e);
         }
     }
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
 }

@@ -8,8 +8,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegisterCommand extends ListenerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegisterCommand.class);
 
     private final SteamUserRepository steamUserRepository;
     private final MatchService matchService;
@@ -22,6 +26,8 @@ public class RegisterCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equals("register")) {
+            logger.info("Handle /register command issued by {}", event.getUser().getName());
+
             OptionMapping steamIdOption = event.getOption("steamid");
             OptionMapping shareCodeOption = event.getOption("sharecode");
             OptionMapping authenticationCodeOption = event.getOption("authenticationcode");
@@ -50,6 +56,9 @@ public class RegisterCommand extends ListenerAdapter {
                 event.reply("Registered :) We are fetching your previous games. This may take a while.")
                         .setEphemeral(true)
                         .queue();
+
+                logger.info("Discord user {} registered their steam account with Steam ID {}",
+                        event.getUser().getName(), steamUser.steamId());
             } else {
                 // Send info
                 // TODO: Improve UI

@@ -36,9 +36,6 @@ public class DemoProviderClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Status Code: " + response.statusCode());
-        System.out.println("Response: " + response.body());
-
         if (response.statusCode() == 500) {
             throw new Exception("Failed to get match information: " + response.body());
         }

@@ -72,9 +72,6 @@ public class SteamClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Status Code: " + response.statusCode());
-        System.out.println("Response: " + response.body());
-
         /*
         Possible responses:
         - Newer share code exists: 200 {'result': {'nextcode': 'CSGO-fAtwf-Q7XyG-JMTiU-x4Wzp-HDpcG'}}
