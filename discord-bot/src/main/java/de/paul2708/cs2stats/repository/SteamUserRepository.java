@@ -6,6 +6,7 @@ import de.chojo.sadu.queries.api.results.writing.manipulation.ManipulationResult
 import de.paul2708.cs2stats.entity.SteamUser;
 
 import java.util.List;
+import java.util.Optional;
 
 import static de.chojo.sadu.queries.api.query.Query.query;
 
@@ -27,6 +28,15 @@ public class SteamUserRepository {
                         .bind("lastKnownShareCode", updatedShareCode)
                         .bind("steamId", steamId))
                 .update();
+    }
+
+    public Optional<SteamUser> findBySteamId(String steamId) {
+        return query("SELECT * FROM steamusers where steamId = :steamId")
+                .single(Call.of()
+                        .bind("steamId", steamId)
+                )
+                .map(SteamUser.map())
+                .first();
     }
 
     public List<SteamUser> findAll() {

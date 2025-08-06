@@ -4,11 +4,9 @@ import de.paul2708.cs2stats.entity.SteamUser;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
 import de.paul2708.cs2stats.service.MatchService;
 import de.paul2708.cs2stats.steam.ShareCode;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +36,7 @@ public class RegisterCommand extends ListenerAdapter {
                 String shareCode = shareCodeOption.getAsString();
                 String authenticationCode = authenticationCodeOption.getAsString();
 
-                // Register
+                // Validate arguments
                 ShareCode parsedShareCode;
                 try {
                     parsedShareCode = ShareCode.fromCode(shareCode);
@@ -49,6 +47,14 @@ public class RegisterCommand extends ListenerAdapter {
                     return;
                 }
 
+                if (steamUserRepository.findBySteamId(steamId).isPresent()) {
+                    event.reply("The Steam user with Steam ID %s is already registered.".formatted(steamId))
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                // Register user
                 SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode);
                 steamUserRepository.create(steamUser);
 
