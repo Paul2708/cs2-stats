@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 public class DemoProviderClient {
 
@@ -24,7 +25,7 @@ public class DemoProviderClient {
         this.client = HttpClient.newHttpClient();
     }
 
-    public Match requestMatch(ShareCode shareCode) throws Exception {
+    public Optional<Match> requestMatch(ShareCode shareCode) throws Exception {
         String url = String.format(
                 ENDPOINT, baseUrl, port, shareCode.shareCode()
         );
@@ -39,10 +40,13 @@ public class DemoProviderClient {
         if (response.statusCode() == 500) {
             throw new Exception("Failed to get match information: " + response.body());
         }
+        if (response.statusCode() == 404) {
+            return Optional.empty();
+        }
 
         if (response.statusCode() == 200) {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(response.body(), Match.class);
+            return Optional.ofNullable(mapper.readValue(response.body(), Match.class));
         }
 
         throw new IllegalStateException("Unexpected response code: " + response.statusCode() + " Body: " + response.body());

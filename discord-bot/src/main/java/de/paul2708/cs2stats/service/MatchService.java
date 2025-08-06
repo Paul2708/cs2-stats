@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -80,10 +81,15 @@ public class MatchService {
                 }
 
                 try {
-                    Match match = demoProviderClient.requestMatch(shareCode);
-                    matchRepository.create(match);
+                    Optional<Match> matchOpt = demoProviderClient.requestMatch(shareCode);
 
-                    logger.info("Found and stored new match with ID {}", shareCode.matchId());
+                    if (matchOpt.isPresent()) {
+                        matchRepository.create(matchOpt.get());
+                        logger.info("Found and stored new match with ID {}", shareCode.matchId());
+                    } else {
+                        logger.warn("Found match, but the demo with share code {} is no longer accessible",
+                                shareCode.shareCode());
+                    }
                 } catch (Exception e) {
                     logger.error("Failed to request match demo for share code {}", shareCode, e);
                 }
