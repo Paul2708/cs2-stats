@@ -47,7 +47,7 @@ public class RankHistoryCommand extends ListenerAdapter {
             for (Match match : matches) {
                 for (PlayerStats playerStats : match.matchDetails().scoreboard()) {
                     if (steamIds.contains(playerStats.steamId())) {
-                        ranks.get(playerStats.steamId()).put(new Date(match.matchTime()), playerStats.updatedRank());
+                        ranks.get(playerStats.steamId()).put(new Date(match.matchTime() * 1000L), playerStats.updatedRank());
                         displayNames.put(playerStats.steamId(), playerStats.name());
                     }
                 }

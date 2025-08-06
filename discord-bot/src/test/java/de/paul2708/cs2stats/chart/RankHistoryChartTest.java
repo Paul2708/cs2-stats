@@ -87,6 +87,21 @@ public class RankHistoryChartTest {
         saveToFile(data, "05-one_year.png");
     }
 
+    @Test
+    void generateRealData() {
+        Map<Date, Integer> ranks = Map.of(
+                new Date(1751657384000L), 11002,
+                new Date(1751660794000L), 11409,
+                new Date(1753383485000L), 0
+        );
+
+        byte[] data = RankHistoryChart.plot(List.of(
+                new RankHistory("Ja lüg' ich denn", ranks)
+        ));
+
+        saveToFile(data, "06-real_data.png");
+    }
+
     private List<Integer> generateRandomSequence(int n) {
         int min = 1000;
         int max = 10000;
