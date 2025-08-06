@@ -1,5 +1,6 @@
 package de.paul2708.cs2stats;
 
+import de.paul2708.cs2stats.discord.RankHistoryCommand;
 import de.paul2708.cs2stats.discord.RegisterCommand;
 import de.paul2708.cs2stats.repository.DatabaseConnector;
 import de.paul2708.cs2stats.repository.MatchRepository;
@@ -29,11 +30,13 @@ public class Main {
         JDA jda = JDABuilder.createDefault(dotenv.get("BOT_TOKEN")).build();
 
         jda.updateCommands().addCommands(
-                Commands.slash("register", "Repeats messages back to you.")
+                Commands.slash("register", "Register your Steam account.")
                         .addOption(OptionType.STRING, "steamid", "Your Steam ID", false)
                         .addOption(OptionType.STRING, "sharecode", "Your latest share code (i.e., CSGO-...).", false)
-                        .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false)
+                        .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", false),
+                Commands.slash("ranks", "Plot the rank history of all registered users.")
         ).queue();
         jda.addEventListener(new RegisterCommand(steamUserRepository, matchRepository, steamClient, demoProviderClient));
+        jda.addEventListener(new RankHistoryCommand(steamUserRepository, matchRepository));
     }
 }
