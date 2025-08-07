@@ -2,12 +2,15 @@ plugins {
     id("java")
 
     application
-    id("com.gradleup.shadow") version "8.3.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-application.mainClass = "de.paul2708.csstats.Main"
 group = "de.paul2708.cs2stats"
 version = "0.1.0"
+
+application {
+    mainClass.set("de.paul2708.cs2stats.Main")
+}
 
 val jdaVersion = "5.6.1"
 
@@ -41,6 +44,12 @@ tasks.withType<JavaCompile> {
     options.isIncremental = true
 
     sourceCompatibility = "21"
+}
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    manifest {
+        attributes["Main-Class"] = "de.paul2708.cs2stats.Main"
+    }
 }
 
 tasks.test {

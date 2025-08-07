@@ -18,7 +18,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 public class Main {
     public static void main(String[] args) {
         // Load environment variables
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
 
         // Connect to database
         DatabaseConnector databaseConnector = new DatabaseConnector();
