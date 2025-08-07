@@ -1,0 +1,22 @@
+{
+  "name": "demo-provider",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@laihoe/demoparser2": "^0.39.1",
+    "bignumber.js": "^9.3.0",
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "globaloffensive": "^3.2.0",
+    "steam-user": "^5.2.3",
+    "unbzip2-stream": "^1.4.3"
+  }
+}
