@@ -1,14 +1,12 @@
 services:
   demo-provider:
-    build:
-      context: ./demo-provider
+    image: ghcr.io/paul2708/cs2-stats-demo-provider:main
     restart: always
     env_file:
       - .env
 
   discord-bot:
-    build:
-      context: ./discord-bot
+    image: ghcr.io/paul2708/cs2-stats-discord-bot:main
     restart: always
     depends_on:
       postgres:
