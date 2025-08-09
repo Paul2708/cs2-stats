@@ -20,7 +20,7 @@ public class InfoCommand extends ListenerAdapter {
             String message = """
                     **👋 Hello %s!**
                     
-                    Here’s what we need from you to proceed with linking your CS:GO account:
+                    Here’s what we need from you to proceed with linking your CS2 account:
                     
                     🔹 **Steam ID** – Your unique Steam ID associated with your Steam account (e.g., `76561198106142637`)
                     🔹 **Share Code** – Code that references the game that is furthest back (e.g., `CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`)

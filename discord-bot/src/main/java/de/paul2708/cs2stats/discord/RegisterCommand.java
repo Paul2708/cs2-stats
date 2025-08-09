@@ -37,6 +37,13 @@ public class RegisterCommand extends ListenerAdapter {
                 String authenticationCode = authenticationCodeOption.getAsString();
 
                 // Validate arguments
+                if (!steamId.matches("[0-9]+")) {
+                    event.reply("Illegal Steam ID. The Steam ID contains only digits. Please use a third-party website like https://steamidcheck.com to get your Steam ID.")
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
                 ShareCode parsedShareCode;
                 try {
                     parsedShareCode = ShareCode.fromCode(shareCode);
