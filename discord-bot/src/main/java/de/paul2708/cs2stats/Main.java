@@ -52,5 +52,6 @@ public class Main {
 
         // Run update task
         matchService.fetchLatestMatchesPeriodically();
+
     }
 }
