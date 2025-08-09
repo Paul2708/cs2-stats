@@ -1,11 +1,10 @@
-name: Build and Push Docker Images
+name: Build and Push Discord Bot Docker Image
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'demo-provider/**'
       - 'discord-bot/**'
 
 jobs:
@@ -29,27 +28,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine changed directory
-        id: changes
-        run: |
-          echo "changed_dir=none" >> $GITHUB_OUTPUT
-          if git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^demo-provider/'; then
-            echo "changed_dir=demo-provider" >> $GITHUB_OUTPUT
-          elif git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | grep -q '^discord-bot/'; then
-            echo "changed_dir=discord-bot" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Build and push image for directory demo-provider
-        if: steps.changes.outputs.changed_dir == 'demo-provider'
-        uses: docker/build-push-action@v5
-        with:
-          context: ./demo-provider
-          file: ./demo-provider/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/demo-provider:latest
-
-      - name: Build and push image for directory discord-bot
-        if: steps.changes.outputs.changed_dir == 'discord-bot'
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: ./discord-bot
