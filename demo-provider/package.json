@@ -17,6 +17,7 @@
     "express": "^5.1.0",
     "globaloffensive": "^3.2.0",
     "steam-user": "^5.2.3",
-    "unbzip2-stream": "^1.4.3"
+    "unbzip2-stream": "^1.4.3",
+    "winston": "^3.17.0"
   }
 }

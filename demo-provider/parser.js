@@ -1,4 +1,5 @@
 const {parseHeader, parseEvent, parseTicks} = require("@laihoe/demoparser2");
+const logger = require('./logger.js');
 
 function parseDemo(demoPath) {
     let gameEndTick = Math.max(...parseEvent(demoPath, "round_end").map(x => x.tick))
@@ -10,7 +11,8 @@ function parseDemo(demoPath) {
         "team_score_first_half", "team_score_second_half", "total_rounds_played"
     ]
     let scoreboard = parseTicks(demoPath, fields, [gameEndTick])
-    console.log(scoreboard);
+
+    logger.debug(`Parser parsed the scoreboard: ${JSON.stringify(scoreboard)}`)
 
     const playerStats = []
 

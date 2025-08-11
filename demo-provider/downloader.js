@@ -4,8 +4,11 @@ const http = require('http');
 const bz2 = require('unbzip2-stream');
 const crypto = require("crypto");
 
-// TODO: Add proper logging
+const logger = require('./logger.js');
+
 function downloadDemo(url, callback) {
+    logger.info(`Start to download demo from URL ${url}`)
+
     const uuid = crypto.randomUUID();
 
     const file = fs.createWriteStream(uuid + '.dem.bz2');
@@ -15,7 +18,7 @@ function downloadDemo(url, callback) {
         response.pipe(file);
         file.on('finish', () => {
             file.close();
-            console.log('Download completed');
+            logger.info("Download completed.");
 
             try {
                 const data = fs.readFileSync(file.path, 'utf8');
@@ -31,11 +34,13 @@ function downloadDemo(url, callback) {
                 return;
             }
 
+            logger.info("Start decompression...")
+
             fs.createReadStream(file.path)
                 .pipe(bz2())
                 .pipe(fs.createWriteStream(pathWithoutExtension))
                 .on('finish', () => {
-                    console.log('Decompression complete');
+                    logger.info('Decompression completed.');
 
                     callback(pathWithoutExtension);
 
@@ -43,14 +48,16 @@ function downloadDemo(url, callback) {
                     fs.unlinkSync(pathWithoutExtension);
                 })
                 .on('error', (err) => {
-                    console.error('Decompression failed:', err);
+                    logger.error('Failed to decompress demo', err);
+
                     fs.unlinkSync(pathWithoutExtension);
                     callback("error: " + err.message);
                 });
         });
     }).on('error', (err) => {
-        fs.unlinkSync(file.path); // delete the file if an error occurs
-        console.error('Download failed:', err.message);
+        logger.error('Download failed', err);
+
+        fs.unlinkSync(file.path);
         callback("error: " + err.message);
     });
 }
