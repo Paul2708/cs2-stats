@@ -5,6 +5,7 @@ import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
 import de.paul2708.cs2stats.steam.DemoProviderClient;
 import de.paul2708.cs2stats.steam.Match;
+import de.paul2708.cs2stats.steam.ShareCode;
 import de.paul2708.cs2stats.steam.SteamClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,34 @@ public class MatchService {
         });
     }
 
+    public void fetchSingleMatch(ShareCode shareCode) {
+        logger.info("Start fetching single match manually with share code {} (match ID:{})", shareCode.shareCode(),
+                shareCode.matchId());
+
+        this.requestSingleMatch(shareCode);
+    }
+
+    private void requestSingleMatch(ShareCode shareCode) {
+        if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
+            logger.info("Found new match but skipped because it is already stored");
+            return;
+        }
+
+        try {
+            Optional<Match> matchOpt = demoProviderClient.requestMatch(shareCode);
+
+            if (matchOpt.isPresent()) {
+                matchRepository.create(matchOpt.get());
+                logger.info("Found and stored new match with ID {}", shareCode.matchId());
+            } else {
+                logger.warn("Found match, but the demo with share code {} is no longer accessible",
+                        shareCode.shareCode());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to request match demo for share code {}", shareCode, e);
+        }
+    }
+
     private void requestMatches(SteamUser steamUser, boolean skipIfEqualCodes) {
         logger.info("Start to request matches for Steam user {}", steamUser.steamId());
 
@@ -75,24 +104,7 @@ public class MatchService {
 
                 steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
 
-                if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
-                    logger.info("Found new match but skipped because it is already stored");
-                    return;
-                }
-
-                try {
-                    Optional<Match> matchOpt = demoProviderClient.requestMatch(shareCode);
-
-                    if (matchOpt.isPresent()) {
-                        matchRepository.create(matchOpt.get());
-                        logger.info("Found and stored new match with ID {}", shareCode.matchId());
-                    } else {
-                        logger.warn("Found match, but the demo with share code {} is no longer accessible",
-                                shareCode.shareCode());
-                    }
-                } catch (Exception e) {
-                    logger.error("Failed to request match demo for share code {}", shareCode, e);
-                }
+                requestSingleMatch(shareCode);
             });
         } catch (IOException | InterruptedException e) {
             logger.error("Failed to fetch consecutive share codes", e);

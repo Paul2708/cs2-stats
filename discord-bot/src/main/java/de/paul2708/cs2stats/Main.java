@@ -1,5 +1,6 @@
 package de.paul2708.cs2stats;
 
+import de.paul2708.cs2stats.discord.FetchCommand;
 import de.paul2708.cs2stats.discord.InfoCommand;
 import de.paul2708.cs2stats.discord.RankHistoryCommand;
 import de.paul2708.cs2stats.discord.RegisterCommand;
@@ -44,11 +45,14 @@ public class Main {
                         .addOption(OptionType.STRING, "steamid", "Your Steam ID", true)
                         .addOption(OptionType.STRING, "sharecode", "Your latest share code (i.e., CSGO-...).", true)
                         .addOption(OptionType.STRING, "authenticationcode", "Your authentication code to download demos.", true),
-                Commands.slash("ranks", "Plot the rank history of all registered users.")
+                Commands.slash("ranks", "Plot the rank history of all registered users."),
+                Commands.slash("fetch", "Fetch a match manually.")
+                        .addOption(OptionType.STRING, "sharecode", "Match share code (i.e., CSGO-...) to be fetched.", true)
         ).queue();
         jda.addEventListener(new InfoCommand());
         jda.addEventListener(new RegisterCommand(steamUserRepository, matchService));
         jda.addEventListener(new RankHistoryCommand(steamUserRepository, matchRepository));
+        jda.addEventListener(new FetchCommand(matchService));
 
         // Run update task
         matchService.fetchLatestMatchesPeriodically();

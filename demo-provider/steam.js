@@ -2,6 +2,7 @@ const SteamUser = require('steam-user');
 const GlobalOffensive = require('globaloffensive');
 const {decodeShareCode} = require("./sharecode");
 
+const logger = require('./logger.js');
 
 const steamUser = new SteamUser();
 const csClient = new GlobalOffensive(steamUser);
@@ -26,32 +27,31 @@ function requestGame(shareCode, callback) {
     }
     requests.push(request);
 
-    console.log(request)
-
     csClient.requestGame(shareCode)
+
+    logger.debug("Waiting to receive match from Steam client")
 }
 
 
 steamUser.on('loggedOn', () => {
-    console.log('Logged on');
+    logger.info("Steam user logged in to Steam");
+
     steamUser.gamesPlayed([730]);
 });
 
 csClient.on('matchList', (matches, data) => {
-    console.log('Match list', matches);
+    logger.debug("Received match list from Steam client")
 
     if (matches.length !== 1) {
-        console.log("Matches contains " + matches.length + " matches.");
+        logger.error(`Match list contains ${matches.length} entries, abort request.`);
         return;
     }
 
     const match = matches[0];
     const matchId = match.matchid;
-    const reservationId = matches[0]["roundstatsall"][matches[0]["roundstatsall"].length - 1]["reservationid"];
     const demoUrl = matches[0]["roundstatsall"][matches[0]["roundstatsall"].length - 1]["map"];
 
-    console.log("Received:")
-    console.log(matchId, reservationId, demoUrl)
+    logger.debug(`Received match with match ID ${matchId} and demo URL ${demoUrl}`)
 
     const requestItem = requests.find(req => req.matchId === matchId);
 
@@ -65,7 +65,7 @@ csClient.on('matchList', (matches, data) => {
 
         requests.splice(requests.indexOf(requestItem), 1);
     } else {
-        console.log('No request found with match id ' + matchId);
+        logger.error(`No request found with match id ${matchId}`);
     }
 });
 
