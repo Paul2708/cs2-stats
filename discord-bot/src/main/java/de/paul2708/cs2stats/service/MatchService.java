@@ -68,7 +68,7 @@ public class MatchService {
         logger.info("Start fetching single match manually with share code {} (match ID:{})", shareCode.shareCode(),
                 shareCode.matchId());
 
-        this.requestSingleMatch(shareCode);
+        this.executorService.submit(() -> this.requestSingleMatch(shareCode));
     }
 
     private void requestSingleMatch(ShareCode shareCode) {
