@@ -104,6 +104,14 @@ public class MatchService {
 
                 steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
 
+                logger.debug("Wait two minutes to ensure that the demo is *really* ready...");
+                try {
+                    Thread.sleep(Duration.ofMinutes(2));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                logger.debug("Proceeding to request game from demo provider");
+
                 requestSingleMatch(shareCode);
             });
         } catch (IOException | InterruptedException e) {
