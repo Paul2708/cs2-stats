@@ -37,6 +37,8 @@ dependencies {
     implementation("org.json:json:20250517")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
+
+    implementation("com.github.freva:ascii-table:1.8.0")
 }
 
 tasks.withType<JavaCompile> {
