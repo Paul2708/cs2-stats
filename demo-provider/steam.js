@@ -10,10 +10,16 @@ const csClient = new GlobalOffensive(steamUser);
 const requests = [];
 
 function connectToSteam(accountName, password) {
+    logger.debug("Connecting to Steam...")
     steamUser.logOn({
         accountName: accountName,
         password: password
     })
+
+    setInterval(() => {
+        logger.debug("Relogging to Steam")
+        steamUser.relog()
+    }, 20 * 60 * 1000);
 }
 
 function requestGame(shareCode, callback) {
