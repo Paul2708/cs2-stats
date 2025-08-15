@@ -1,6 +1,7 @@
 package de.paul2708.cs2stats;
 
 import de.paul2708.cs2stats.discord.*;
+import de.paul2708.cs2stats.discord.history.HistoryCommand;
 import de.paul2708.cs2stats.repository.DatabaseConnector;
 import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
