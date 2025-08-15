@@ -24,9 +24,9 @@ function parseDemo(demoPath) {
         const teamRounds = player.team_score_first_half + player.team_score_second_half;
         const enemyRounds = totalRounds - teamRounds;
 
-        if (totalRounds > enemyRounds) {
+        if (teamRounds > enemyRounds) {
             rank = player.rank_if_win;
-        } else if (totalRounds < enemyRounds) {
+        } else if (teamRounds < enemyRounds) {
             rank = player.rank_if_loss;
         } else {
             rank = player.rank_if_tie;
