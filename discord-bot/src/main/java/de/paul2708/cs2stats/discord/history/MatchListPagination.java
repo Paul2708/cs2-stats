@@ -56,6 +56,9 @@ public class MatchListPagination extends Pagination<AnnotatedMatch, MatchListPag
                                 .header("MVPs")
                                 .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).mvps())),
                         new Column()
+                                .header("Rank")
+                                .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).updatedRank())),
+                        new Column()
                                 .header("Elo Gain/Loss")
                                 .with(AnnotatedMatch::eloDiff)
                 )
