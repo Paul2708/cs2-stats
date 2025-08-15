@@ -55,6 +55,7 @@ public class HistoryCommand extends ListenerAdapter {
                                 .collect(Collectors.toSet()).
                                 contains(steamId))
                         .sorted(Comparator.comparingLong(Match::matchTime))
+                        .limit(5)
                         .toList()
                         .reversed();
 
@@ -99,7 +100,7 @@ public class HistoryCommand extends ListenerAdapter {
                         )
                 );
 
-                event.reply("```\n" + table + "\n```")
+                event.reply("**Last " + matches.size() + " Matches**\n```\n" + table + "\n```")
                         .setEphemeral(true)
                         .queue();
             }
