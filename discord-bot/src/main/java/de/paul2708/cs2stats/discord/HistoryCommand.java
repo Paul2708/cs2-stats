@@ -59,51 +59,68 @@ public class HistoryCommand extends ListenerAdapter {
                         .toList()
                         .reversed();
 
-                String table = AsciiTable.getTable(AsciiTable.FANCY_ASCII, matches, Arrays.asList(
-                                new Column()
-                                        .header("Date")
-                                        .with(match -> DATE_FORMAT.format(new Date(match.matchTime() * 1000L))),
-                                new Column()
-                                        .header("Map")
-                                        .with(match -> match.matchDetails().map()),
-                                new Column()
-                                        .header("Kills")
-                                        .with(match -> String.valueOf(match.matchDetails().scoreboard().stream()
-                                                .filter(playerStats -> playerStats.steamId().equals(steamId))
-                                                .findFirst()
-                                                .get()
-                                                .kills())),
-                                new Column()
-                                        .header("Deaths")
-                                        .with(match -> String.valueOf(match.matchDetails().scoreboard().stream()
-                                                .filter(playerStats -> playerStats.steamId().equals(steamId))
-                                                .findFirst().
-                                                get()
-                                                .deaths())),
-
-                                new Column()
-                                        .header("MVPs")
-                                        .with(match -> String.valueOf(match.matchDetails().scoreboard().stream()
-                                                .filter(playerStats -> playerStats.steamId().equals(steamId))
-                                                .findFirst()
-                                                .get()
-                                                .mvps())),
-
-                                new Column()
-                                        .header("New Rank")
-                                        .with(match -> String.valueOf(match.matchDetails().scoreboard().stream()
-                                                .filter(playerStats -> playerStats.steamId().equals(steamId))
-                                                .findFirst().
-                                                get()
-                                                .updatedRank()))
-
-                        )
-                );
+                String table = this.generateTable(steamId, matches);
 
                 event.reply("**Last " + matches.size() + " Matches**\n```\n" + table + "\n```")
                         .setEphemeral(true)
                         .queue();
             }
         }
+    }
+
+    private String generateTable(String steamId, List<Match> matches) {
+        Map<Match, OptionalInt> eloDiff = new HashMap<>();
+
+        for (int i = 0; i < matches.size() - 1; i++) {
+            int rank = matches.get(i).matchDetails()
+                    .getPlayerStats(steamId)
+                    .updatedRank();
+            int previousRank = matches.get(i + 1).matchDetails()
+                    .getPlayerStats(steamId)
+                    .updatedRank();
+
+            if (rank == 0 || previousRank == 0) {
+                eloDiff.put(matches.get(i), OptionalInt.empty());
+            } else {
+                eloDiff.put(matches.get(i), OptionalInt.of(rank - previousRank));
+            }
+        }
+
+        eloDiff.put(matches.getLast(), OptionalInt.empty());
+
+        return AsciiTable.getTable(AsciiTable.FANCY_ASCII, matches, Arrays.asList(
+                        new Column()
+                                .header("Date")
+                                .with(match -> DATE_FORMAT.format(new Date(match.matchTime() * 1000L))),
+                        new Column()
+                                .header("Map")
+                                .with(match -> match.matchDetails().map()),
+                        new Column()
+                                .header("Kills")
+                                .with(match -> String.valueOf(match.matchDetails().getPlayerStats(steamId).kills())),
+                        new Column()
+                                .header("Deaths")
+                                .with(match -> String.valueOf(match.matchDetails().getPlayerStats(steamId).deaths())),
+                        new Column()
+                                .header("MVPs")
+                                .with(match -> String.valueOf(match.matchDetails().getPlayerStats(steamId).mvps())),
+                        new Column()
+                                .header("Elo Gain/Loss")
+                                .with(match -> formatEloDiff(eloDiff.get(match)))
+                )
+        );
+    }
+
+    private String formatEloDiff(OptionalInt eloDiffOpt) {
+        if (eloDiffOpt.isEmpty()) {
+            return "-/-";
+        }
+
+        int eloDiff = eloDiffOpt.getAsInt();
+        if (eloDiff > 0) {
+            return "+%d".formatted(eloDiff);
+        }
+
+        return String.valueOf(eloDiff);
     }
 }
