@@ -31,6 +31,7 @@ app.get('/demo/:shareCode', (req, res) => {
                 const response = {
                     matchId: matchId,
                     demoUrl: demoUrl,
+                    shareCode: req.params.shareCode,
                     matchDetails: parseDemo(path),
                     matchTime: matchTime,
                 }

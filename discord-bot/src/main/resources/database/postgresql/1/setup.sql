@@ -11,5 +11,7 @@ CREATE TABLE matches
     matchId   VARCHAR(255) PRIMARY KEY,
     matchTime BIGINT       NOT NULL,
     map       VARCHAR(255) NOT NULL,
+    demoUrl   VARCHAR(255) NOT NULL,
+    shareCode VARCHAR(255) NOT NULL,
     stats     JSON         NOT NULL
 );

@@ -5,7 +5,18 @@ public record PlayerStats(
         String steamId,
         int deaths,
         int kills,
+        int assists,
+        int headshotKills,
+        int aces,
+        int fourKRounds,
+        int threeKRounds,
+        int damage,
+        int utilityDamage,
+        int enemiesFlashed,
+        int cashEarned,
         int mvps,
-        int updatedRank
+        int updatedRank,
+        int totalRounds,
+        int teamRounds
 ) {
 }

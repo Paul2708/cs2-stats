@@ -27,11 +27,13 @@ public class MatchRepository {
             throw new RuntimeException(e);
         }
 
-        query("INSERT INTO matches(matchId, matchTime, map, stats) VALUES(:matchId, :matchTime, :map, :stats::jsonb)")
+        query("INSERT INTO matches(matchId, matchTime, map, demoUrl, shareCode, stats) VALUES(:matchId, :matchTime, :map, :demoUrl, :shareCode, :stats::jsonb)")
                 .single(Call.of()
                         .bind("matchId", match.matchId())
                         .bind("matchTime", match.matchTime())
                         .bind("map", match.matchDetails().map())
+                        .bind("demoUrl", match.demoUrl())
+                        .bind("shareCode", match.shareCode())
                         .bind("stats", statsAsJson))
                 .insert();
     }
