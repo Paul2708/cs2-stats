@@ -42,6 +42,30 @@ app.get('/demo/:shareCode', (req, res) => {
     })
 })
 
+app.get('/demo-url', (req, res) => {
+    const demoUrl = req.query.demoUrl;
+
+    logger.info(`Received request for demo URL ${demoUrl}`)
+
+    downloadDemo(demoUrl, (path) => {
+        if (path.startsWith("error: Google Edge Cache")) {
+            logger.error(`Failed to download demo for demo URL ${demoUrl}: ${path}`)
+            res.status(404).send(path);
+        } else if (path.startsWith("error")) {
+            logger.error(`Failed to download demo for demo URL ${demoUrl}: ${path}`)
+            res.status(500).send(path);
+        } else {
+            const response = {
+                demoUrl: demoUrl,
+                matchDetails: parseDemo(path),
+            }
+            res.status(200).send(response)
+
+            logger.debug(`Sent response for demo URL ${demoUrl}: ${JSON.stringify(response)}`)
+        }
+    })
+})
+
 app.listen(port, () => {
     logger.info(`Demo provider is up and running on port ${port}`)
 })
