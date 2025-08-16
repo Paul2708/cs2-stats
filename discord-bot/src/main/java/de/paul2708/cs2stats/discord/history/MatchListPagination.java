@@ -55,30 +55,27 @@ public class MatchListPagination extends Pagination<AnnotatedMatch, MatchListPag
 
                                     String outcome;
                                     if (teamRounds > enemyRounds) {
-                                        outcome = "Win";
+                                        outcome = "W";
                                     } else if (enemyRounds > teamRounds) {
-                                        outcome = "Loss";
+                                        outcome = "L";
                                     } else {
-                                        outcome = "Draw";
+                                        outcome = "D";
                                     }
 
                                     return "%d:%d (%s)".formatted(teamRounds, enemyRounds, outcome);
                                 }),
                         new Column()
-                                .header("Kills")
-                                .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).kills())),
-                        new Column()
-                                .header("Deaths")
-                                .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).deaths())),
-                        new Column()
-                                .header("MVPs")
-                                .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).mvps())),
+                                .header("K/D")
+                                .with(match -> match.match().matchDetails().getPlayerStats(steamId).kills() + " / " + match.match().matchDetails().getPlayerStats(steamId).deaths()),
                         new Column()
                                 .header("Rank")
                                 .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).updatedRank())),
                         new Column()
-                                .header("Elo Gain/Loss")
-                                .with(AnnotatedMatch::eloDiff)
+                                .header("Elo")
+                                .with(AnnotatedMatch::eloDiff),
+                        new Column()
+                                .header("Match ID")
+                                .with(match -> match.match().matchId())
                 )
         );
     }
