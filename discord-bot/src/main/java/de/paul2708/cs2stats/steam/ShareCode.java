@@ -11,6 +11,8 @@ public record ShareCode(String shareCode, String matchId, String outcomeId, Stri
     private static final Pattern SHARE_CODE_PATTERN = Pattern.compile("^(CSGO)?(-?[" + DICTIONARY + "]{5}){5}$");
     private static final BigInteger BITMASK_64 = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
 
+    public static final ShareCode NONE = ShareCode.fromCode("CSGO-AAAAA-AAAAA-AAAAA-AAAAA-AAAAA");
+
     private static BigInteger swapEndianness(BigInteger number) {
         BigInteger result = BigInteger.ZERO;
         for (int n = 0; n < 144; n += 8) {
