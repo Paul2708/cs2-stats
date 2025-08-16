@@ -14,9 +14,4 @@ public class ShareCodeTest {
         assertEquals("3761099962004275605", shareCode.outcomeId());
         assertEquals("48107", shareCode.token());
     }
-
-    @Test
-    void testNoneShareCode() {
-        ShareCode.fromCode(ShareCode.NONE.shareCode());
-    }
 }

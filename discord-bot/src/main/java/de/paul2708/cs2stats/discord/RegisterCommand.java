@@ -62,7 +62,7 @@ public class RegisterCommand extends ListenerAdapter {
                 }
 
                 // Register user
-                SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, ShareCode.NONE);
+                SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode);
                 steamUserRepository.create(steamUser);
 
                 matchService.fetchLatestMatches(steamUser);
