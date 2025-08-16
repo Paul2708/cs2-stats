@@ -9,7 +9,7 @@ function parseDemo(demoPath) {
         "3k_rounds_total", "damage_total", "utility_damage_total", "enemies_flashed_total", "cash_earned_total",
         "mvps",
         "rank_if_win", "rank_if_loss", "rank_if_tie",
-        "team_score_first_half", "team_score_second_half", "total_rounds_played"
+        "team_score_first_half", "team_score_second_half", "total_rounds_played", "team_score_overtime"
     ]
     let scoreboard = parseTicks(demoPath, fields, [gameEndTick])
 
@@ -22,7 +22,7 @@ function parseDemo(demoPath) {
 
         let rank;
         const totalRounds = player.total_rounds_played;
-        const teamRounds = player.team_score_first_half + player.team_score_second_half;
+        const teamRounds = player.team_score_first_half + player.team_score_second_half + player.team_score_overtime;
         const enemyRounds = totalRounds - teamRounds;
 
         if (teamRounds > enemyRounds) {
