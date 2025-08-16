@@ -47,6 +47,24 @@ public class MatchListPagination extends Pagination<AnnotatedMatch, MatchListPag
                                 .header("Map")
                                 .with(match -> match.match().matchDetails().map()),
                         new Column()
+                                .header("Result")
+                                .with(match -> {
+                                    int totalRounds = match.match().matchDetails().getPlayerStats(steamId).totalRounds();
+                                    int teamRounds = match.match().matchDetails().getPlayerStats(steamId).teamRounds();
+                                    int enemyRounds = totalRounds - teamRounds;
+
+                                    String outcome;
+                                    if (teamRounds > enemyRounds) {
+                                        outcome = "Win";
+                                    } else if (enemyRounds > teamRounds) {
+                                        outcome = "Loss";
+                                    } else {
+                                        outcome = "Draw";
+                                    }
+
+                                    return "%d:%d (%s)".formatted(teamRounds, enemyRounds, outcome);
+                                }),
+                        new Column()
                                 .header("Kills")
                                 .with(match -> String.valueOf(match.match().matchDetails().getPlayerStats(steamId).kills())),
                         new Column()
