@@ -28,7 +28,9 @@ public class InfoCommand extends ListenerAdapter {
                     
                     Run the command `/register` with the required information.
                     
-                    You can access and generate the required information by clicking the buttons below:
+                    You can access and generate the required information by clicking the buttons below.
+                    
+                    **Note**: If you already have an authentication code, please re-generate the credentials on the same page.
                     
                     """.formatted(event.getUser().getAsMention());
 
