@@ -4,6 +4,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DemoProviderClientTest {
@@ -22,9 +24,11 @@ public class DemoProviderClientTest {
         DemoProviderClient demoProviderClient = new DemoProviderClient(dotenv);
 
         try {
-            Match match = demoProviderClient.requestMatch(ShareCode.fromCode("CSGO-KDoMb-JO4FR-7R3QX-jRvD9-ApWjM"));
+            Optional<Match> match = demoProviderClient.requestMatch(ShareCode.fromCode("CSGO-KDoMb-JO4FR-7R3QX-jRvD9-ApWjM"));
 
-            assertEquals("de_nuke", match.matchDetails().map());
+            assertTrue(match.isPresent());
+
+            assertEquals("de_nuke", match.get().matchDetails().map());
         } catch (Exception e) {
             fail(e);
         }

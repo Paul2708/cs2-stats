@@ -22,7 +22,7 @@ public record ShareCode(String shareCode, String matchId, String outcomeId, Stri
 
     public static ShareCode fromCode(String shareCode) {
         if (!SHARE_CODE_PATTERN.matcher(shareCode).matches()) {
-            throw new IllegalArgumentException("Invalid share code");
+            throw new IllegalArgumentException("Invalid share code: %s".formatted(shareCode));
         }
 
         String code = shareCode.replace("CSGO-", "").replace("-", "");
@@ -32,7 +32,7 @@ public record ShareCode(String shareCode, String matchId, String outcomeId, Stri
         for (char c : code.toCharArray()) {
             int index = DICTIONARY.indexOf(c);
             if (index == -1) {
-                throw new IllegalArgumentException("Invalid character in share code");
+                throw new IllegalArgumentException("Invalid character in share code: %s".formatted(shareCode));
             }
             a = a.multiply(BigInteger.valueOf(DICTIONARY.length())).add(BigInteger.valueOf(index));
         }

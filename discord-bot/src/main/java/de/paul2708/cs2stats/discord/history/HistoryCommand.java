@@ -79,7 +79,9 @@ public class HistoryCommand extends ListenerAdapter {
                     }
                 }
 
-                eloDiff.put(matches.getLast(), OptionalInt.empty());
+                if (!matches.isEmpty()) {
+                    eloDiff.put(matches.getLast(), OptionalInt.empty());
+                }
 
                 // Construct annotated matches
                 List<AnnotatedMatch> annotatedMatches = new ArrayList<>();
