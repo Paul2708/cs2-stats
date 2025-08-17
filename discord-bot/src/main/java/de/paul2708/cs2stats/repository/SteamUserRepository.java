@@ -11,12 +11,13 @@ import static de.chojo.sadu.queries.api.query.Query.query;
 public class SteamUserRepository {
 
     public void create(SteamUser user) {
-        query("INSERT INTO steamusers(steamId, initialShareCode, authenticationCode, lastKnownShareCode) VALUES(:steamId, :initialShareCode, :authenticationCode, :lastKnownShareCode)")
+        query("INSERT INTO steamusers(steamId, initialShareCode, authenticationCode, lastKnownShareCode, discordUserName) VALUES(:steamId, :initialShareCode, :authenticationCode, :lastKnownShareCode, :discordUserName)")
                 .single(Call.of()
                         .bind("steamId", user.steamId())
                         .bind("initialShareCode", user.initialShareCode().shareCode())
                         .bind("authenticationCode", user.authenticationCode())
-                        .bind("lastKnownShareCode", user.lastKnownShareCode().shareCode()))
+                        .bind("lastKnownShareCode", user.lastKnownShareCode().shareCode())
+                        .bind("discordUserName", user.discordUserName()))
                 .insert();
     }
 
@@ -32,6 +33,15 @@ public class SteamUserRepository {
         return query("SELECT * FROM steamusers where steamId = :steamId")
                 .single(Call.of()
                         .bind("steamId", steamId)
+                )
+                .map(SteamUser.map())
+                .first();
+    }
+
+    public Optional<SteamUser> findByDiscordName(String discordUserName) {
+        return query("SELECT * FROM steamusers where discordUserName = :discordUserName")
+                .single(Call.of()
+                        .bind("discordUserName", discordUserName)
                 )
                 .map(SteamUser.map())
                 .first();

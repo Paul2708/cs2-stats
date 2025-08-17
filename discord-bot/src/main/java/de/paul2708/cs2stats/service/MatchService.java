@@ -100,7 +100,7 @@ public class MatchService {
         SteamUser steamUser = steamUserRepository.findBySteamId(steamUserId)
                 .orElseThrow();
 
-        logger.info("Start to request matches for Steam user {}", steamUser.steamId());
+        logger.info("Start to request matches for user {} (Steam ID {})", steamUser.discordUserName(), steamUser.steamId());
 
         boolean registration = steamUser.initialShareCode().equals(steamUser.lastKnownShareCode());
 

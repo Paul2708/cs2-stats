@@ -47,7 +47,7 @@ public class Main {
                 Commands.slash("fetch", "Fetch a match manually.")
                         .addOption(OptionType.STRING, "sharecode", "Match share code (i.e., CSGO-...) to be fetched.", true),
                 Commands.slash("history", "Show the history for a given Steam user.")
-                        .addOption(OptionType.STRING, "steamid", "User's Steam ID", true)
+                        .addOption(OptionType.USER, "target", "Select the Discord user", true)
         ).queue();
         jda.addEventListener(new InfoCommand());
         jda.addEventListener(new RegisterCommand(steamUserRepository, matchService));

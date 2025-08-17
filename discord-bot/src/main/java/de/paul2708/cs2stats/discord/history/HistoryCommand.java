@@ -1,10 +1,12 @@
 package de.paul2708.cs2stats.discord.history;
 
+import de.paul2708.cs2stats.entity.SteamUser;
 import de.paul2708.cs2stats.repository.MatchRepository;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
 import de.paul2708.cs2stats.steam.Match;
 import de.paul2708.cs2stats.steam.PlayerStats;
 import de.paul2708.cs2stats.util.Pagination;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -36,17 +38,20 @@ public class HistoryCommand extends ListenerAdapter {
         if (event.getName().equals("history")) {
             logger.info("Handle /history command issued by {}", event.getUser().getName());
 
-            OptionMapping steamIdOption = event.getOption("steamid");
+            OptionMapping targetOption = event.getOption("target");
 
-            if (steamIdOption != null) {
-                String steamId = steamIdOption.getAsString();
+            if (targetOption != null) {
+                User target = targetOption.getAsUser();
+                Optional<SteamUser> targetOpt = steamUserRepository.findByDiscordName(target.getName());
 
-                if (steamUserRepository.findBySteamId(steamId).isEmpty()) {
-                    event.reply("The Steam user with Steam ID %s is not registered.".formatted(steamId))
+                if (targetOpt.isEmpty()) {
+                    event.reply("The user %s is not registered.".formatted(target.getName()))
                             .setEphemeral(true)
                             .queue();
                     return;
                 }
+
+                String steamId = targetOpt.get().steamId();
 
                 // Filter player matches
                 List<Match> matches = matchRepository.findAll()

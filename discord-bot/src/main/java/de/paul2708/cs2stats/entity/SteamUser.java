@@ -4,7 +4,8 @@ import de.chojo.sadu.mapper.annotation.MappingProvider;
 import de.chojo.sadu.mapper.rowmapper.RowMapping;
 import de.paul2708.cs2stats.steam.ShareCode;
 
-public record SteamUser(String steamId, ShareCode initialShareCode, String authenticationCode, ShareCode lastKnownShareCode) {
+public record SteamUser(String steamId, ShareCode initialShareCode, String authenticationCode,
+                        ShareCode lastKnownShareCode, String discordUserName) {
 
     @MappingProvider({"user"})
     public static RowMapping<SteamUser> map() {
@@ -12,7 +13,8 @@ public record SteamUser(String steamId, ShareCode initialShareCode, String authe
                 row.getString("steamId"),
                 ShareCode.fromCode(row.getString("initialShareCode")),
                 row.getString("authenticationCode"),
-                ShareCode.fromCode(row.getString("lastKnownShareCode"))
+                ShareCode.fromCode(row.getString("lastKnownShareCode")),
+                row.getString("discordUserName")
         );
     }
 }
