@@ -17,6 +17,7 @@ public record PlayerStats(
         int mvps,
         int updatedRank,
         int totalRounds,
-        int teamRounds
+        int teamRounds,
+        boolean isPremier
 ) {
 }

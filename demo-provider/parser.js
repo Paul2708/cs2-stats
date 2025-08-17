@@ -9,7 +9,8 @@ function parseDemo(demoPath) {
         "3k_rounds_total", "damage_total", "utility_damage_total", "enemies_flashed_total", "cash_earned_total",
         "mvps",
         "rank_if_win", "rank_if_loss", "rank_if_tie",
-        "team_score_first_half", "team_score_second_half", "total_rounds_played", "team_score_overtime"
+        "team_score_first_half", "team_score_second_half", "total_rounds_played", "team_score_overtime",
+        "is_matchmaking", "match_making_mode"
     ]
     let scoreboard = parseTicks(demoPath, fields, [gameEndTick])
 
@@ -50,7 +51,8 @@ function parseDemo(demoPath) {
             "mvps": player.mvps,
             "updatedRank": rank,
             "totalRounds": totalRounds,
-            "teamRounds": teamRounds
+            "teamRounds": teamRounds,
+            "isPremier": player.is_matchmaking && player.match_making_mode === 1
         })
     }
 

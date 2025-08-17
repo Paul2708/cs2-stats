@@ -18,6 +18,10 @@ public record Match(
         long matchTime
 ) {
 
+    public boolean isPremier() {
+        return matchDetails.scoreboard().getFirst().isPremier();
+    }
+
     @MappingProvider({"match"})
     public static RowMapping<Match> map() {
         return row -> new Match(
