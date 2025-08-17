@@ -10,8 +10,8 @@ import de.paul2708.cs2stats.steam.SteamClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,17 +40,16 @@ public class MatchService {
     }
 
     public void fetchLatestMatches(SteamUser steamUser) {
-        this.executorService.submit(() -> requestMatches(steamUser, false));
+        this.executorService.submit(() -> requestMatches(steamUser.steamId()));
     }
 
     public void fetchLatestMatchesPeriodically() {
         periodicExecutorService.submit(() -> {
             //noinspection InfiniteLoopStatement
             while (true) {
-                logger.info("Start fetching latest matches for all registered users.");
                 try {
                     for (SteamUser steamUser : steamUserRepository.findAll()) {
-                        this.executorService.submit(() -> requestMatches(steamUser, true));
+                        fetchLatestMatches(steamUser);
                         Thread.sleep(Duration.ofMinutes(1));
                     }
 
@@ -58,8 +57,6 @@ public class MatchService {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-
-                logger.info("Fetch completed.");
             }
         });
     }
@@ -68,20 +65,27 @@ public class MatchService {
         logger.info("Start fetching single match manually with share code {} (match ID:{})", shareCode.shareCode(),
                 shareCode.matchId());
 
+        if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
+            logger.info("Found a match but skipped because it is already stored");
+            return;
+        }
+
         this.executorService.submit(() -> this.requestSingleMatch(shareCode));
     }
 
     private void requestSingleMatch(ShareCode shareCode) {
-        if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
-            logger.info("Found new match but skipped because it is already stored");
-            return;
-        }
-
         try {
             Optional<Match> matchOpt = demoProviderClient.requestMatch(shareCode);
 
             if (matchOpt.isPresent()) {
-                matchRepository.create(matchOpt.get());
+                Match match = matchOpt.get();
+
+                if (!match.isPremier()) {
+                    logger.warn("Found match, but it's not a Premier match.");
+                    return;
+                }
+
+                matchRepository.create(match);
                 logger.info("Found and stored new match with ID {}", shareCode.matchId());
             } else {
                 logger.warn("Found match, but the demo with share code {} is no longer accessible",
@@ -92,32 +96,59 @@ public class MatchService {
         }
     }
 
-    private void requestMatches(SteamUser steamUser, boolean skipIfEqualCodes) {
+    private void requestMatches(String steamUserId) {
+        SteamUser steamUser = steamUserRepository.findBySteamId(steamUserId)
+                .orElseThrow();
+
         logger.info("Start to request matches for Steam user {}", steamUser.steamId());
 
+        boolean registration = steamUser.initialShareCode().equals(steamUser.lastKnownShareCode());
+
         try {
-            steamClient.requestConsecutiveCodes(steamUser.steamId(), steamUser.authenticationCode(), steamUser.lastKnownShareCode().shareCode(), shareCode -> {
-                if (skipIfEqualCodes && steamUser.lastKnownShareCode().equals(shareCode)) {
-                    logger.info("No new match found.");
-                    return;
+            List<ShareCode> shareCodes = steamClient.requestConsecutiveCodes(steamUser.steamId(), steamUser.authenticationCode(), steamUser.lastKnownShareCode().shareCode());
+
+            if (!registration) {
+                shareCodes.removeFirst();
+            } else {
+                logger.warn("Include initial share code due to a new registration");
+            }
+
+            if (shareCodes.isEmpty()) {
+                logger.info("Steam didn't found a new share code.");
+                return;
+            }
+
+            logger.info("Steam found {} new share code(s)", shareCodes.size());
+
+            for (ShareCode shareCode : shareCodes) {
+                logger.info("Requesting match for share code {}...", shareCode.shareCode());
+
+                if (matchRepository.findMatchById(shareCode.matchId()).isPresent()) {
+                    steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
+
+                    logger.info("Found a match but skipped because it is already stored");
+                    continue;
                 }
 
-                steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
-
-                logger.debug("Wait two minutes to ensure that the demo is *really* ready...");
-                try {
-                    Thread.sleep(Duration.ofMinutes(2));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                if (!registration) {
+                    logger.info("We wait two minutes to ensure that the demo is *really* ready...");
+                    try {
+                        Thread.sleep(Duration.ofMinutes(2));
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                logger.debug("Proceeding to request game from demo provider");
+
+                logger.info("Proceeding to request game from demo provider");
 
                 requestSingleMatch(shareCode);
-            });
-        } catch (IOException | InterruptedException e) {
+
+                steamUserRepository.updateLastKnownShareCode(steamUser.steamId(), shareCode.shareCode());
+            }
+        } catch (Exception e) {
             logger.error("Failed to fetch consecutive share codes", e);
         }
 
-        logger.info("Completed.");
+        logger.info("Fetch completed.");
     }
 }
