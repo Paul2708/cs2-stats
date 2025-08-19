@@ -36,6 +36,8 @@ public class RegisterCommand extends ListenerAdapter {
                 String shareCode = shareCodeOption.getAsString();
                 String authenticationCode = authenticationCodeOption.getAsString();
 
+                String discordUsername = event.getUser().getName();
+
                 // Validate arguments
                 if (!steamId.matches("[0-9]+")) {
                     event.reply("Illegal Steam ID. The Steam ID contains only digits. Please use a third-party website like https://steamidcheck.com to get your Steam ID.")
@@ -60,10 +62,16 @@ public class RegisterCommand extends ListenerAdapter {
                             .queue();
                     return;
                 }
+                if (steamUserRepository.findByDiscordName(discordUsername).isPresent()) {
+                    event.reply("You already registered a Steam account.")
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
 
                 // Register user
                 SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode,
-                        event.getUser().getName());
+                        discordUsername);
                 steamUserRepository.create(steamUser);
 
                 matchService.fetchLatestMatches(steamUser);
