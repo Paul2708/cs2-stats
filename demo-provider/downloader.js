@@ -16,6 +16,7 @@ function downloadDemo(url, callback) {
 
     http.get(url, (response) => {
         response.pipe(file);
+
         file.on('finish', () => {
             file.close();
             logger.info("Download completed.");
@@ -34,7 +35,7 @@ function downloadDemo(url, callback) {
                 return;
             }
 
-            logger.info("Start decompression...")
+            logger.info("Start decompression...");
 
             fs.createReadStream(file.path)
                 .pipe(bz2())
@@ -59,6 +60,11 @@ function downloadDemo(url, callback) {
 
         fs.unlinkSync(file.path);
         callback("error: " + err.message);
+    }).setTimeout(2 * 60 * 1000, function () {
+        logger.error('Download timed out after 2 minutes');
+        this.abort();
+        fs.unlinkSync(file.path);
+        callback("error: Download timeout");
     });
 }
 
