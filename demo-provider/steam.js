@@ -7,6 +7,8 @@ const logger = require('./logger.js');
 const steamUser = new SteamUser();
 const csClient = new GlobalOffensive(steamUser);
 
+let connected = false;
+
 const requests = [];
 
 function connectToSteam(accountName, password) {
@@ -17,12 +19,17 @@ function connectToSteam(accountName, password) {
     })
 
     setInterval(() => {
+        connected = false;
         logger.debug("Relogging to Steam")
         steamUser.relog()
     }, 20 * 60 * 1000);
 }
 
-function requestGame(shareCode, callback) {
+async function requestGame(shareCode, callback) {
+    while (!connected) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
     const {matchId, outcomeId, token} = decodeShareCode(shareCode)
 
     const request = {
@@ -43,6 +50,8 @@ steamUser.on('loggedOn', () => {
     logger.info("Steam user logged in to Steam");
 
     steamUser.gamesPlayed([730]);
+
+    connected = true;
 });
 
 csClient.on('matchList', (matches, data) => {

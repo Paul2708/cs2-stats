@@ -12,10 +12,10 @@ const port = 3000
 
 connectToSteam(process.env.STEAM_USERNAME, process.env.STEAM_PASSWORD)
 
-app.get('/demo/:shareCode', (req, res) => {
+app.get('/demo/:shareCode', async (req, res) => {
     logger.info(`Received request for share code ${req.params.shareCode}`)
 
-    requestGame(req.params.shareCode, (matchResponse) => {
+    await requestGame(req.params.shareCode, (matchResponse) => {
         const matchId = matchResponse.matchId;
         const demoUrl = matchResponse.demoUrl;
         const matchTime = matchResponse.matchTime;
