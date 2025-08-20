@@ -50,7 +50,7 @@ public class Main {
                         .addOption(OptionType.USER, "target", "Select the Discord user", true)
         ).queue();
         jda.addEventListener(new InfoCommand());
-        jda.addEventListener(new RegisterCommand(steamUserRepository, matchService));
+        jda.addEventListener(new RegisterCommand(steamUserRepository, matchService, steamClient));
         jda.addEventListener(new RankHistoryCommand(steamUserRepository, matchRepository));
         jda.addEventListener(new FetchCommand(matchService));
         jda.addEventListener(new HistoryCommand(steamUserRepository, matchRepository));

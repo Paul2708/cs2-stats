@@ -4,11 +4,15 @@ import de.paul2708.cs2stats.entity.SteamUser;
 import de.paul2708.cs2stats.repository.SteamUserRepository;
 import de.paul2708.cs2stats.service.MatchService;
 import de.paul2708.cs2stats.steam.ShareCode;
+import de.paul2708.cs2stats.steam.SteamClient;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Optional;
 
 public class RegisterCommand extends ListenerAdapter {
 
@@ -17,9 +21,12 @@ public class RegisterCommand extends ListenerAdapter {
     private final SteamUserRepository steamUserRepository;
     private final MatchService matchService;
 
-    public RegisterCommand(SteamUserRepository steamUserRepository, MatchService matchService) {
+    private final SteamClient steamClient;
+
+    public RegisterCommand(SteamUserRepository steamUserRepository, MatchService matchService, SteamClient steamClient) {
         this.steamUserRepository = steamUserRepository;
         this.matchService = matchService;
+        this.steamClient = steamClient;
     }
 
     @Override
@@ -39,8 +46,34 @@ public class RegisterCommand extends ListenerAdapter {
                 String discordUsername = event.getUser().getName();
 
                 // Validate arguments
-                if (!steamId.matches("[0-9]+")) {
-                    event.reply("Illegal Steam ID. The Steam ID contains only digits. Please use a third-party website like https://steamidcheck.com to get your Steam ID.")
+                String resolvedSteamId = null;
+                try {
+                    if (steamId.matches("[0-9]+")) {
+                        if (!steamClient.requestExistence(steamId)) {
+                            event.reply("The provided Steam ID does not exist. Please use a third-party website like https://steamidcheck.com to get your Steam ID.")
+                                    .setEphemeral(true)
+                                    .queue();
+                            return;
+                        }
+
+                        resolvedSteamId = steamId;
+                    }
+
+                    if (resolvedSteamId == null) {
+                        Optional<String> steamIdOptional = steamClient.requestSteamId(steamId);
+                        if (steamIdOptional.isEmpty()) {
+                            event.reply("The provided Steam ID does not exist. Please use a third-party website like https://steamidcheck.com to get your Steam ID.")
+                                    .setEphemeral(true)
+                                    .queue();
+                            return;
+                        }
+
+                        resolvedSteamId = steamIdOptional.get();
+                    }
+                } catch (IOException | InterruptedException e) {
+                    logger.error("Failed to validate Steam ID", e);
+
+                    event.reply("Failed to validate your Steam ID. Please report this issue to the developers.")
                             .setEphemeral(true)
                             .queue();
                     return;
@@ -70,7 +103,7 @@ public class RegisterCommand extends ListenerAdapter {
                 }
 
                 // Register user
-                SteamUser steamUser = new SteamUser(steamId, parsedShareCode, authenticationCode, parsedShareCode,
+                SteamUser steamUser = new SteamUser(resolvedSteamId, parsedShareCode, authenticationCode, parsedShareCode,
                         discordUsername);
                 steamUserRepository.create(steamUser);
 
